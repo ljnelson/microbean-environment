@@ -1,3 +1,3 @@
-# microBean™ Settings
+# microBean™ Environment
 
-Configuration for Java.
+Environmental objects for Java.
