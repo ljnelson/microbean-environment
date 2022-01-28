@@ -45,10 +45,7 @@ import org.microbean.environment.api.Path.Element;
 import org.microbean.environment.api.Qualifiers;
 
 import org.microbean.environment.provider.AbstractProvider;
-import org.microbean.environment.provider.AssignableType;
 import org.microbean.environment.provider.Value;
-
-import org.microbean.type.Types;
 
 /**
  * An {@link AbstractProvider} that is capable of {@linkplain Proxy

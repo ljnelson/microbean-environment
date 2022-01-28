@@ -20,8 +20,8 @@ import java.lang.reflect.Type;
 
 import java.util.Objects;
 
-import org.microbean.type.CovariantTypeSemantics;
-import org.microbean.type.TypeSemantics;
+import org.microbean.type.Type.CovariantSemantics;
+import org.microbean.type.Type.Semantics;
 
 /**
  * A {@link Type} that captures covariant assignability rules.
@@ -32,7 +32,7 @@ import org.microbean.type.TypeSemantics;
  * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  *
- * @see CovariantTypeSemantics
+ * @see CovariantSemantics
  */
 public record AssignableType(Type type) implements Type {
 
@@ -42,7 +42,7 @@ public record AssignableType(Type type) implements Type {
    */
 
 
-  private static final TypeSemantics covariantTypeSemantics = new CovariantTypeSemantics(false);
+  private static final Semantics covariantSemantics = new CovariantSemantics();
 
 
   /**
@@ -91,10 +91,10 @@ public record AssignableType(Type type) implements Type {
   /**
    * Returns {@code true} if and only if a reference bearing the
    * supplied {@link Type} {@linkplain
-   * CovariantTypeSemantics#isAssignable(Type, Type) can be assigned}
-   * to a reference bearing the return value of the {@link #type()}
-   * method according to {@linkplain CovariantTypeSemantics covariant
-   * type semantics}.
+   * CovariantSemantics#assignable(Type, Type) can be assigned} to a
+   * reference bearing the return value of the {@link #type()} method
+   * according to {@linkplain CovariantSemantics covariant type
+   * semantics}.
    *
    * @param payload the {@link Type} to test; must not be {@code null}
    *
@@ -112,8 +112,8 @@ public record AssignableType(Type type) implements Type {
    */
   public final boolean isAssignable(final Type payload) {
     return
-      covariantTypeSemantics.isAssignable(this.type(),
-                                          payload instanceof AssignableType a ? a.type() : Objects.requireNonNull(payload));
+      covariantSemantics.assignable(this.type(),
+                                    payload instanceof AssignableType a ? a.type() : Objects.requireNonNull(payload));
   }
 
   /**

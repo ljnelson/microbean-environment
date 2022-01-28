@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2021 microBean™.
+ * Copyright © 2021–2022 microBean™.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.lang.reflect.Type;
 import org.microbean.environment.api.Loader;
 import org.microbean.environment.api.Path;
 import org.microbean.environment.api.Qualifiers;
-import org.microbean.environment.api.TypeToken.ActualTypeArgumentExtractor;
 
 /**
  * A skeletal {@link Provider} implementation.
@@ -41,12 +40,12 @@ public abstract class AbstractProvider<T> implements Provider {
 
 
   /*
-   * Static fields.
+   * Instance fields.
    */
 
 
-  private static final ActualTypeArgumentExtractor actualTypeArgumentExtractor = new ActualTypeArgumentExtractor(AbstractProvider.class, 0);
-  
+  private final Type upperBound;
+
 
   /*
    * Constructors.
@@ -58,12 +57,19 @@ public abstract class AbstractProvider<T> implements Provider {
    */
   protected AbstractProvider() {
     super();
+    this.upperBound = this.mostSpecializedParameterizedSuperclass().getActualTypeArguments()[0];
   }
 
+
+  /*
+   * Instance methods.
+   */
+
+
   /**
-   * Returns a {@link Type} representing the upper bound of all
-   * possible {@linkplain Value values} {@linkplain #get(Loader,
-   * Path) supplied} by this {@link AbstractProvider}.
+   * Returns a {@link Type} representing the <strong>upper bound of
+   * all possible {@linkplain Value values}</strong> {@linkplain
+   * #get(Loader, Path) supplied} by this {@link AbstractProvider}.
    *
    * <p>The value returned is harvested from the sole type argument
    * supplied to {@link AbstractProvider} by a concrete subclass.</p>
@@ -77,12 +83,40 @@ public abstract class AbstractProvider<T> implements Provider {
    *
    * @threadsafety This method is safe for concurrent use by multiple
    * threads.
-   *
-   * @see ActualTypeArgumentExtractor
    */
   @Override // Provider
   public final Type upperBound() {
-    return actualTypeArgumentExtractor.get(this.getClass());
+    return this.upperBound;
+  }
+
+  private final ParameterizedType mostSpecializedParameterizedSuperclass() {
+    return mostSpecializedParameterizedSuperclass(AbstractProvider.class, this.getClass());
+  }
+
+
+  /*
+   * Static methods.
+   */
+
+
+  private static final ParameterizedType mostSpecializedParameterizedSuperclass(final Class<?> stopClass, final Type type) {
+    if (type == null || type == Object.class || type == stopClass) {
+      return null;
+    } else {
+      final Class<?> erasure;
+      if (type instanceof Class<?> c) {
+        erasure = c;
+      } else if (type instanceof ParameterizedType p) {
+        erasure = (Class<?>)p.getRawType();
+      } else {
+        erasure = null;
+      }
+      if (erasure == null || erasure == Object.class || !(stopClass.isAssignableFrom(erasure))) {
+        return null;
+      } else {
+        return type instanceof ParameterizedType p ? p : mostSpecializedParameterizedSuperclass(stopClass, erasure.getGenericSuperclass());
+      }
+    }
   }
 
 }

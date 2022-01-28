@@ -416,13 +416,13 @@ public final class Qualifiers {
   }
 
   /**
-   * Returns a non-{@code null} {@link String} representatino of this
+   * Returns a non-{@code null} {@link String} representation of this
    * {@link Qualifiers}.
    *
    * <p>The format of the returned {@link String} is deliberately
    * unspecified.</p>
    *
-   * @return a non-{@code null} {@link String} representatino of this
+   * @return a non-{@code null} {@link String} representation of this
    * {@link Qualifiers}
    *
    * @nullability This method never returns {@code null}.

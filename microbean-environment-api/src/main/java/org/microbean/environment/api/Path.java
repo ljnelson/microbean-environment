@@ -18,7 +18,11 @@ package org.microbean.environment.api;
 
 import java.lang.StackWalker.StackFrame;
 
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,8 +42,6 @@ import org.microbean.development.annotation.EntryPoint;
 import org.microbean.development.annotation.Experimental;
 
 import org.microbean.environment.api.Path.Element;
-
-import org.microbean.type.Types;
 
 /**
  * A sequence of {@link Path.Element}s representing part of a request
@@ -313,7 +315,7 @@ public final class Path<T> implements Iterable<Element<?>> {
   public final <U> Path<U> with(final Class<U> type) {
     if (type == this.type()) {
       @SuppressWarnings("unchecked")
-      final Path<U> returnValue = (Path<U>)this;
+        final Path<U> returnValue = (Path<U>)this;
       return returnValue;
     } else {
       final List<Element<?>> newElements = new ArrayList<>(this.size());
@@ -354,7 +356,7 @@ public final class Path<T> implements Iterable<Element<?>> {
   public final <U> Path<U> with(final TypeToken<U> type) {
     if (type.type() == this.type()) {
       @SuppressWarnings("unchecked")
-      final Path<U> returnValue = (Path<U>)this;
+        final Path<U> returnValue = (Path<U>)this;
       return returnValue;
     } else {
       final List<Element<?>> newElements = new ArrayList<>(this.size());
@@ -690,8 +692,8 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see #type()
    */
   @SuppressWarnings("unchecked")
-  public final Class<T> typeErasure() {    
-    return (Class<T>)Types.erase(this.type());
+  public final Class<T> typeErasure() {
+    return (Class<T>)erase(this.type());
   }
 
   /**
@@ -1466,6 +1468,105 @@ public final class Path<T> implements Iterable<Element<?>> {
     }
   }
 
+  private static final Class<?> erase(final Type type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    // 4.6. Type Erasure
+    //
+    // Type erasure is a mapping from types (possibly including
+    // parameterized types and type variables) to types (that are
+    // never parameterized types or type variables). We write |T| for
+    // the erasure of type T. The erasure mapping is defined as
+    // follows:
+    //
+    // The erasure of a parameterized type (§4.5) G<T1,…,Tn> is |G|.
+    //
+    // The erasure of a nested type T.C is |T|.C.
+    //
+    // The erasure of an array type T[] is |T|[].
+    //
+    // The erasure of a type variable (§4.4) is the erasure of its
+    // leftmost bound.
+    //
+    // The erasure of every other type is the type itself.
+    if (type == null) {
+      return null;
+    } else if (type instanceof Class<?> c) {
+      return erase(c);
+    } else if (type instanceof ParameterizedType p) {
+      return erase(p);
+    } else if (type instanceof GenericArrayType g) {
+      return erase(g);
+    } else if (type instanceof TypeVariable<?> tv) {
+      return erase(tv);
+    } else if (type instanceof WildcardType w) {
+      return erase(w);
+    } else {
+      return null;
+    }
+  }
+
+  private static final Class<?> erase(final Class<?> type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    // …
+    // The erasure of a nested type T.C is
+    // |T|.C. [Class.getDeclaringClass() returns an already erased
+    // type.]
+    //
+    // The erasure of an array type T[] is |T|[]. [A Class that is an
+    // array has a Class as its component type, and that is already
+    // erased.]
+    // …
+    // The erasure of every other type is the type itself. [So in all
+    // cases we can just return the supplied Class<?>.]
+    return type;
+  }
+
+  private static final Class<?> erase(final ParameterizedType type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    // …
+    // The erasure of a parameterized type (§4.5) G<T1,…,Tₙ> is |G|
+    // [|G| means the erasure of G, i.e. the erasure of
+    // type.getRawType()].
+    return erase(type.getRawType());
+  }
+
+  private static final Class<?> erase(final GenericArrayType type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    //
+    // The erasure of an array type T[] is |T|[]. [|T| means the
+    // erasure of T. We erase the genericComponentType() and use
+    // Class#arrayType() to find the "normal" array class for the
+    // erasure.]
+    final Class<?> componentType = erase(type.getGenericComponentType());
+    if (componentType == null) {
+      return null;
+    } else {
+      return componentType.arrayType();
+    }
+  }
+
+  private static final Class<?> erase(final TypeVariable<?> type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    //
+    // The erasure of a type variable (§4.4) is the erasure of its
+    // leftmost bound. [In the case of a TypeVariable<?> that returns
+    // multiple bounds, we know they will start with a class, not an
+    // interface and not a type variable.]
+    final Type[] bounds = type.getBounds();
+    return bounds.length > 0 ? erase(bounds[0]) : Object.class;
+  }
+
+  private static final Class<?> erase(final WildcardType type) {
+    // https://docs.oracle.com/javase/specs/jls/se11/html/jls-4.html#jls-4.6
+    //
+    // The erasure of a type variable (§4.4) is the erasure of its
+    // leftmost bound.  [WildcardTypes aren't really in the JLS per se
+    // but they behave like type variables. Only upper bounds will
+    // matter here.]
+    final Type[] bounds = type.getUpperBounds();
+    return bounds != null && bounds.length > 0 ? erase(bounds[0]) : Object.class;
+  }
+
 
   /*
    * Inner and nested classes.
@@ -1623,7 +1724,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      */
     public final Optional<Class<T>> typeErasure() {
       @SuppressWarnings("unchecked")
-      final Class<T> c = (Class<T>)Types.erase(this.type().orElse(null));
+      final Class<T> c = (Class<T>)erase(this.type().orElse(null));
       return Optional.ofNullable(c);
     }
 
@@ -1654,7 +1755,7 @@ public final class Path<T> implements Iterable<Element<?>> {
     public final <U> Element<U> with(final Class<U> type) {
       if (type == this.type().orElse(null)) {
         @SuppressWarnings("unchecked")
-        final Element<U> returnValue = (Element<U>)this;
+          final Element<U> returnValue = (Element<U>)this;
         return returnValue;
       } else if (type == void.class && this.name().isEmpty()) {
         return (Element<U>)root();
@@ -1691,7 +1792,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       final Type t = type.type();
       if (t == this.type().orElse(null)) {
         @SuppressWarnings("unchecked")
-        final Element<U> returnValue = (Element<U>)this;
+          final Element<U> returnValue = (Element<U>)this;
         return returnValue;
       } else if (t == void.class && this.name().isEmpty()) {
         return (Element<U>)root();
@@ -2140,7 +2241,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      * Optional#get() yield} the supplied {@code argument}.
      *
      * @param <U> the type of the {@link Element}
-     * 
+     *
      * @param name the name for the {@link Element}; may be {@code
      * null}
      *
