@@ -88,8 +88,8 @@ public interface Loader<T> extends OptionalSupplier<T> {
    * Returns the {@link Loader} serving as the parent of this
    * {@link Loader}.
    *
-   * <p>The "root" {@link Loader} must return itself from its {@link
-   * #parent()} implementation.</p>
+   * <p>The bootstrap {@link Loader} (see {@link #loader()}) must
+   * return itself from its {@link #parent()} implementation.</p>
    *
    * <p>Implementations of this method must not return {@code
    * null}.</p>
@@ -106,6 +106,8 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @idempotency Implementations of this method must be idempotent
    * and deterministic.
+   *
+   * @see #loader()
    */
   // Note that the root will have itself as its parent.
   public Loader<?> parent();
@@ -292,10 +294,10 @@ public interface Loader<T> extends OptionalSupplier<T> {
       }
     }
     return
-      this.load(this.absolutePath().plus(Path.of(Element.of("transliterate", // name
-                                                          new TypeToken<Path<U>>() {}, // type
-                                                          Path.class, // parameter
-                                                          path.toString())))) // sole argument
+      this.load(this.absolutePath().plus(Path.of(Element.of(new TypeToken<Path<U>>() {}, // type
+                                                            "transliterate", // name
+                                                            Path.class, // parameter
+                                                            path.toString())))) // sole argument
       .orElse(path);
   }
 
@@ -416,10 +418,10 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @param <U> the type of the returned {@link Loader}
    *
-   * @param name the {@linkplain Element#name() name} of an {@link
+   * @param type the {@linkplain Element#type() type} of an {@link
    * Element}; must not be {@code null}
    *
-   * @param type the {@linkplain Element#type() type} of an {@link
+   * @param name the {@linkplain Element#name() name} of an {@link
    * Element}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
@@ -444,12 +446,12 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Element)
    *
-   * @see Element#of(String, Class)
+   * @see Element#of(Class, String)
    */
   @Convenience
   @OverridingDiscouraged
-  public default <U> Loader<U> load(final String name, final Class<U> type) {
-    return this.load(Element.of(name, type));
+  public default <U> Loader<U> load(final Class<U> type, final String name) {
+    return this.load(Element.of(type, name));
   }
 
   /**
@@ -457,10 +459,10 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @param <U> the type of the returned {@link Loader}
    *
-   * @param name the {@linkplain Element#name() name} of an {@link
+   * @param type the {@linkplain Element#type() type} of an {@link
    * Element}; must not be {@code null}
    *
-   * @param type the {@linkplain Element#type() type} of an {@link
+   * @param name the {@linkplain Element#name() name} of an {@link
    * Element}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
@@ -485,21 +487,21 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Element)
    *
-   * @see Element#of(String, TypeToken)
+   * @see Element#of(TypeToken, String)
    */
   @Convenience
   @OverridingDiscouraged
-  public default <U> Loader<U> load(final String name, final TypeToken<U> type) {
-    return this.load(Element.of(name, type));
+  public default <U> Loader<U> load(final TypeToken<U> type, final String name) {
+    return this.load(Element.of(type, name));
   }
 
   /**
    * Calls the {@link #load(Element)} method and returns its result.
    *
-   * @param name the {@linkplain Element#name() name} of an {@link
+   * @param type the {@linkplain Element#type() type} of an {@link
    * Element}; must not be {@code null}
    *
-   * @param type the {@linkplain Element#type() type} of an {@link
+   * @param name the {@linkplain Element#name() name} of an {@link
    * Element}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
@@ -524,12 +526,12 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Element)
    *
-   * @see Element#of(String, Type)
+   * @see Element#of(Type, String)
    */
   @Convenience
   @OverridingDiscouraged
-  public default Loader<?> load(final String name, final Type type) {
-    return this.load(Element.of(name, type));
+  public default Loader<?> load(final Type type, final String name) {
+    return this.load(Element.of(type, name));
   }
 
   /**
@@ -537,11 +539,11 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @param <U> the type of the returned {@link Loader}
    *
-   * @param names a sequence of {@link Element} {@linkplain
-   * Element#name() names}; must not be {@code null}
-   *
    * @param type an {@link Element} {@linkplain Element#type() type};
    * must not be {@code null}
+   *
+   * @param names a sequence of {@link Element} {@linkplain
+   * Element#name() names}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
    * objects suitable for the supplied {@code nonRootElement}; never
@@ -565,12 +567,12 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Path)
    *
-   * @see Path#of(List, Class)
+   * @see Path#of(Class, List)
    */
   @Convenience
   @OverridingDiscouraged
-  public default <U> Loader<U> load(final List<? extends String> names, final Class<U> type) {
-    return this.load(Path.of(names, type));
+  public default <U> Loader<U> load(Class<U> type, final List<? extends String> names) {
+    return this.load(Path.of(type, names));
   }
 
   /**
@@ -578,11 +580,11 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @param <U> the type of the returned {@link Loader}
    *
-   * @param names a sequence of {@link Element} {@linkplain
-   * Element#name() names}; must not be {@code null}
-   *
    * @param type an {@link Element} {@linkplain Element#type() type};
    * must not be {@code null}
+   *
+   * @param names a sequence of {@link Element} {@linkplain
+   * Element#name() names}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
    * objects suitable for the supplied {@code nonRootElement}; never
@@ -606,22 +608,22 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Path)
    *
-   * @see Path#of(List, TypeToken)
+   * @see Path#of(TypeToken, List)
    */
   @Convenience
   @OverridingDiscouraged
-  public default <U> Loader<U> load(final List<? extends String> names, final TypeToken<U> type) {
-    return this.load(Path.of(names, type));
+  public default <U> Loader<U> load(final TypeToken<U> type, final List<? extends String> names) {
+    return this.load(Path.of(type, names));
   }
 
   /**
    * Calls the {@link #load(Path)} method and returns its result.
    *
-   * @param names a sequence of {@link Element} {@linkplain
-   * Element#name() names}; must not be {@code null}
-   *
    * @param type an {@link Element} {@linkplain Element#type() type};
    * must not be {@code null}
+   *
+   * @param names a sequence of {@link Element} {@linkplain
+   * Element#name() names}; must not be {@code null}
    *
    * @return a {@link Loader} capable of supplying environmental
    * objects suitable for the supplied {@code nonRootElement}; never
@@ -645,12 +647,12 @@ public interface Loader<T> extends OptionalSupplier<T> {
    *
    * @see #load(Path)
    *
-   * @see Path#of(List, Type)
+   * @see Path#of(Type, List)
    */
   @Convenience
   @OverridingDiscouraged
-  public default Loader<?> load(final List<? extends String> names, final Type type) {
-    return this.load(Path.of(names, type));
+  public default Loader<?> load(final Type type, final List<? extends String> names) {
+    return this.load(Path.of(type, names));
   }
 
   /**
@@ -891,8 +893,9 @@ public interface Loader<T> extends OptionalSupplier<T> {
    * <p>First, a <em>bootstrap {@link Loader}</em> is located using
    * the {@link ServiceLoader}.  The first of all discovered {@link
    * Loader} instances is used and all others are ignored.  Note that
-   * the {@link ServiceLoader} discovery process is
-   * non-deterministic.</p>
+   * the {@link ServiceLoader} discovery process is non-deterministic.
+   * Normally there is only one such {@link Loader} provided by an
+   * implementation of this API.</p>
    *
    * <p>The bootstrap {@link Loader} that is loaded via this mechanism
    * is subject to the following restrictions:</p>
@@ -917,19 +920,18 @@ public interface Loader<T> extends OptionalSupplier<T> {
    * </ul>
    *
    * <p>This bootstrap {@link Loader} is then used to {@linkplain
-   * #load(TypeToken) find} the "real" {@link Loader} implementation,
+   * #load(TypeToken) find} the <em>{@link Loader} of record</em>,
    * which in most cases is simply itself.</p>
    *
-   * <p>The {@link Loader} that is thus {@linkplain #load(TypeToken)
-   * supplied} by the bootstrap {@link Loader} is subject to the
-   * following restrictions (which are compatible with the {@link
-   * Loader}'s being the bootstrap {@link Loader} itself):</p>
+   * <p>This {@link Loader} of record is subject to the following
+   * restrictions (which are compatible with the overwhelmingly common
+   * case of its being the bootstrap {@link Loader} itself):</p>
    *
    * <ul>
    *
    * <li>It must return a {@link Path} from its {@link
    * #absolutePath()} implementation that is equal to {@link
-   * Path#root() Path.root()}.</li>
+   * Path#root() Path.root()} (same as above).</li>
    *
    * <li>It must return the bootstrap {@link Loader} from its {@link
    * #parent()} implementation.</li>
@@ -938,6 +940,10 @@ public interface Loader<T> extends OptionalSupplier<T> {
    * itself, from its {@link #get() get()} method.</li>
    *
    * </ul>
+   *
+   * <p>Undefined behavior will result if an implementation of the
+   * {@link Loader} interface does not honor the requirements
+   * above.</p>
    *
    * <p>This is the entry point for end users of this framework.</p>
    *

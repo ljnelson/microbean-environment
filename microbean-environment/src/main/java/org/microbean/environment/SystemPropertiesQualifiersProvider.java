@@ -67,7 +67,7 @@ public class SystemPropertiesQualifiersProvider extends AbstractProvider<Qualifi
    *
    * <ul>
    *
-   * <li>Calls the {@link Loader#load(String, Class)} method of the
+   * <li>Calls the {@link Loader#load(Class, String)} method of the
    * supplied {@link Loader} to find a {@link String} qualified with
    * "{@code qualifierPrefix}".  In the very common case where such a
    * {@link String} is not found, "{@code qualifier.}" is used
@@ -134,7 +134,7 @@ public class SystemPropertiesQualifiersProvider extends AbstractProvider<Qualifi
   private static final Qualifiers qualifiers(final Loader<?> requestor) {
     // Use the configuration system to find a String under the path
     // :void/qualifierPrefix:java.lang.String.
-    final String prefix = requestor.load("qualifierPrefix", String.class).orElse("qualifier.");
+    final String prefix = requestor.load(String.class, "qualifierPrefix").orElse("qualifier.");
     final int prefixLength = prefix.length();
     final SortedMap<String, String> map = new TreeMap<>();
     final Properties systemProperties = System.getProperties();

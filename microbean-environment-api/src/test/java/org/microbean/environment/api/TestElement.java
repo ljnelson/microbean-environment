@@ -65,25 +65,25 @@ final class TestElement {
 
   @Test
   final void testParseFooStringNoParamsNoArgs() throws ClassNotFoundException {
-    assertEquals(Element.of("foo", String.class),
+    assertEquals(Element.of(String.class, "foo"),
                  new Element.Parser(this.getClass().getClassLoader()).parse("foo:java.lang.String"));
   }
 
   @Test
   final void testParseFooStringEmptyParamsEmptyArgs() throws ClassNotFoundException {
-    assertEquals(Element.of("foo", String.class, List.of(), List.of()),
+    assertEquals(Element.of(String.class, "foo", List.of(), List.of()),
                  new Element.Parser(this.getClass().getClassLoader()).parse("foo():java.lang.String"));
   }
 
   @Test
   final void testParseFooStringOneParamNoArgs() throws ClassNotFoundException {
-    assertEquals(Element.of("foo", String.class, List.of(String.class), null),
+    assertEquals(Element.of(String.class, "foo", List.of(String.class), null),
                  new Element.Parser(this.getClass().getClassLoader()).parse("foo(java.lang.String):java.lang.String"));
   }
 
   @Test
   final void testParseFooStringTwoParamsTwoArgs() throws ClassNotFoundException {
-    assertEquals(Element.of("foo", String.class, List.of(String.class, Integer.class), List.of("goop", "4")),
+    assertEquals(Element.of(String.class, "foo", List.of(String.class, Integer.class), List.of("goop", "4")),
                  new Element.Parser(this.getClass().getClassLoader()).parse("foo(java.lang.String=goop,java.lang.Integer=4):java.lang.String"));
   }
 

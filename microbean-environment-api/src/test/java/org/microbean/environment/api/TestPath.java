@@ -67,14 +67,14 @@ final class TestPath {
   @Test
   final void testPathParse() throws ClassNotFoundException {
     assertEquals(Path.of(List.of(Element.root(),
-                                 Element.of("foo", String.class, List.of(String.class, Integer.class), List.of("goop", "4")))),
+                                 Element.of(String.class, "foo", List.of(String.class, Integer.class), List.of("goop", "4")))),
                  new Path.Parser(this.getClass().getClassLoader()).parse("/foo(java.lang.String=goop,java.lang.Integer=4):java.lang.String"));
   }
 
   @Test
   final void testPathParseWithEscapedSlash() throws ClassNotFoundException {
     assertEquals(Path.of(List.of(Element.root(),
-                                 Element.of("/foo", String.class, List.of(String.class, Integer.class), List.of("goop", "4")))),
+                                 Element.of(String.class, "/foo", List.of(String.class, Integer.class), List.of("goop", "4")))),
                  new Path.Parser(this.getClass().getClassLoader()).parse("/\\/foo(java.lang.String=goop,java.lang.Integer=4):java.lang.String"));
   }
 

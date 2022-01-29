@@ -407,7 +407,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    * Returns a new {@link Path} consisting of all the {@linkplain
    * Path.Element elements} of this {@link Path} in order plus an
    * {@linkplain Path.Element element} {@linkplain
-   * Path.Element#of(String, Type) formed} from the supplied
+   * Path.Element#of(Type, String) formed} from the supplied
    * arguments.
    *
    * @param name the {@linkplain Path.Element#name() name} for the new
@@ -433,14 +433,14 @@ public final class Path<T> implements Iterable<Element<?>> {
    */
   @Convenience
   public final <U> Path<U> plus(final String name, final Class<U> type) {
-    return this.plus(Element.of(name, type));
+    return this.plus(Element.of(type, name));
   }
 
   /**
    * Returns a new {@link Path} consisting of all the {@linkplain
    * Path.Element elements} of this {@link Path} in order plus an
    * {@linkplain Path.Element element} {@linkplain
-   * Path.Element#of(String, Type) formed} from the supplied
+   * Path.Element#of(Type, String) formed} from the supplied
    * arguments.
    *
    * @param name the {@linkplain Path.Element#name() name} for the new
@@ -466,20 +466,20 @@ public final class Path<T> implements Iterable<Element<?>> {
    */
   @Convenience
   public final <U> Path<U> plus(final String name, final TypeToken<U> type) {
-    return this.plus(Element.of(name, type));
+    return this.plus(Element.of(type, name));
   }
 
   /**
    * Returns a new {@link Path} consisting of all the {@linkplain
    * Path.Element elements} of this {@link Path} in order plus an
    * {@linkplain Path.Element element} {@linkplain
-   * Path.Element#of(String, Type) formed} from the supplied
+   * Path.Element#of(Type, String) formed} from the supplied
    * arguments.
    *
-   * @param name the {@linkplain Path.Element#name() name} for the new
+   * @param type the {@linkplain Path.Element#type() type} for the new
    * trailing {@link Path.Element}; must not be {@code null}
    *
-   * @param type the {@linkplain Path.Element#type() type} for the new
+   * @param name the {@linkplain Path.Element#name() name} for the new
    * trailing {@link Path.Element}; must not be {@code null}
    *
    * @return the new {@link Path}; never {@code null}
@@ -496,8 +496,8 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see #plus(Path.Element)
    */
   @Convenience
-  public final Path<?> plus(final String name, final Type type) {
-    return this.plus(Element.of(name, type));
+  public final Path<?> plus(final Type type, final String name) {
+    return this.plus(Element.of(type, name));
   }
 
   /**
@@ -1149,7 +1149,7 @@ public final class Path<T> implements Iterable<Element<?>> {
   }
 
   /**
-   * Invokes the {@link Element#of(String, Class, List, List)} method
+   * Invokes the {@link Element#of(Class, String, List, List)} method
    * with the supplied {@code type}, passes the result to the {@link
    * #of(Element)} method, and returns the result.
    *
@@ -1172,14 +1172,14 @@ public final class Path<T> implements Iterable<Element<?>> {
    *
    * @see #of(Element)
    *
-   * @see Element#of(String, Class, List, List)
+   * @see Element#of(Class, String, List, List)
    */
   public static final <U> Path<U> of(final Class<U> type) {
-    return of(Element.of("", type, (List<? extends Class<?>>)null, (List<? extends String>)null));
+    return of(Element.of(type, "", (List<? extends Class<?>>)null, (List<? extends String>)null));
   }
 
   /**
-   * Invokes the {@link Element#of(String, TypeToken, List, List)}
+   * Invokes the {@link Element#of(TypeToken, String, List, List)}
    * method with the supplied {@code type}, passes the result to the
    * {@link #of(Element)} method, and returns the result.
    *
@@ -1202,14 +1202,14 @@ public final class Path<T> implements Iterable<Element<?>> {
    *
    * @see #of(Element)
    *
-   * @see Element#of(String, TypeToken, List, List)
+   * @see Element#of(TypeToken, String, List, List)
    */
   public static final <U> Path<U> of(final TypeToken<U> type) {
-    return of(Element.of("", type, (List<? extends Class<?>>)null, (List<? extends String>)null));
+    return of(Element.of(type, "", (List<? extends Class<?>>)null, (List<? extends String>)null));
   }
 
   /**
-   * Invokes the {@link Element#of(String, Type, List, List)} method
+   * Invokes the {@link Element#of(Type, String, List, List)} method
    * with the supplied {@code type}, passes the result to the {@link
    * #of(Element)} method, and returns the result.
    *
@@ -1228,10 +1228,10 @@ public final class Path<T> implements Iterable<Element<?>> {
    *
    * @see #of(Element)
    *
-   * @see Element#of(String, Type, List, List)
+   * @see Element#of(Type, String, List, List)
    */
   public static final Path<?> of(final Type type) {
-    return of(Element.of("", type, (List<? extends Class<?>>)null, (List<? extends String>)null));
+    return of(Element.of(type, "", (List<? extends Class<?>>)null, (List<? extends String>)null));
   }
 
   /**
@@ -1333,13 +1333,13 @@ public final class Path<T> implements Iterable<Element<?>> {
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
    *
-   * @param names a list of {@link String}s that will become
-   * {@linkplain Element#name() element names}; must not be {@code
-   * null}
-   *
    * @param type the {@linkplain Element#type() type} of the returned
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
+   *
+   * @param names a list of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
    *
    * @return a suitable {@link Path}; never {@code null}
    *
@@ -1357,7 +1357,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see Element#of(TypeToken)
    */
   @SuppressWarnings("unchecked")
-  public static final <U> Path<U> of(final List<? extends String> names, final TypeToken<U> type) {
+  public static final <U> Path<U> of(final TypeToken<U> type, List<? extends String> names) {
     final List<Element<?>> elements = new ArrayList<>(names.size() + 1);
     for (final String name : names) {
       elements.add(Element.of(name));
@@ -1376,13 +1376,13 @@ public final class Path<T> implements Iterable<Element<?>> {
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
    *
-   * @param names a list of {@link String}s that will become
-   * {@linkplain Element#name() element names}; must not be {@code
-   * null}
-   *
    * @param type the {@linkplain Element#type() type} of the returned
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
+   *
+   * @param names a list of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
    *
    * @return a suitable {@link Path}; never {@code null}
    *
@@ -1400,7 +1400,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see Element#of(Class)
    */
   @SuppressWarnings("unchecked")
-  public static final <U> Path<U> of(final List<? extends String> names, final Class<U> type) {
+  public static final <U> Path<U> of(final Class<U> type, final List<? extends String> names) {
     final List<Element<?>> elements = new ArrayList<>(names.size() + 1);
     for (final String name : names) {
       elements.add(Element.of(name));
@@ -1415,13 +1415,13 @@ public final class Path<T> implements Iterable<Element<?>> {
    * supplies that {@link List} to the {@link #of(List)} method, and
    * returns the resulting {@link Path}.
    *
-   * @param names a list of {@link String}s that will become
-   * {@linkplain Element#name() element names}; must not be {@code
-   * null}
-   *
    * @param type the {@linkplain Element#type() type} of the returned
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
+   *
+   * @param names a list of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
    *
    * @return a suitable {@link Path}; never {@code null}
    *
@@ -1438,7 +1438,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    *
    * @see Element#of(Type)
    */
-  public static final Path<?> of(final List<? extends String> names, final Type type) {
+  public static final Path<?> of(final Type type, final List<? extends String> names) {
     final List<Element<?>> elements = new ArrayList<>(names.size() + 1);
     for (final String name : names) {
       elements.add(Element.of(name));
@@ -1591,7 +1591,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      */
 
 
-    private static final Element<Void> ROOT = new Element<>("", void.class, null, null, true);
+    private static final Element<Void> ROOT = new Element<>(void.class, "", null, null, true);
 
 
     /*
@@ -1613,8 +1613,8 @@ public final class Path<T> implements Iterable<Element<?>> {
      */
 
 
-    private Element(final String name,
-                    final Type type,
+    private Element(final Type type,
+                    final String name,
                     final List<? extends Class<?>> parameters,
                     final List<? extends String> arguments,
                     final boolean root) {
@@ -1760,7 +1760,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       } else if (type == void.class && this.name().isEmpty()) {
         return (Element<U>)root();
       } else {
-        return new Element<>(this.name(), type, this.parameters().orElse(null), this.arguments().orElse(null), false);
+        return new Element<>(type, this.name(), this.parameters().orElse(null), this.arguments().orElse(null), false);
       }
     }
 
@@ -1797,7 +1797,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       } else if (t == void.class && this.name().isEmpty()) {
         return (Element<U>)root();
       } else {
-        return new Element<>(this.name(), t, this.parameters().orElse(null), this.arguments().orElse(null), false);
+        return new Element<>(t, this.name(), this.parameters().orElse(null), this.arguments().orElse(null), false);
       }
     }
 
@@ -1828,7 +1828,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       } else if (type == void.class && this.name().isEmpty()) {
         return root();
       } else {
-        return new Element<>(this.name(), type, this.parameters().orElse(null), this.arguments().orElse(null), false);
+        return new Element<>(type, this.name(), this.parameters().orElse(null), this.arguments().orElse(null), false);
       }
     }
 
@@ -2091,10 +2091,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the Element
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameters the parameters for the {@link Element}; may
@@ -2120,14 +2120,14 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     @SuppressWarnings("unchecked")
-    public static final <U> Element<U> of(final String name,
-                                          final Class<U> type,
+    public static final <U> Element<U> of(final Class<U> type,
+                                          final String name,
                                           final List<? extends Class<?>> parameters,
                                           final List<? extends String> arguments) {
       if ((name == null || name.isEmpty()) && type == void.class && parameters == null && arguments == null) {
         return (Element<U>)root();
       }
-      return new Element<>(name, type, parameters, arguments, false);
+      return new Element<>(type, name, parameters, arguments, false);
     }
 
     /**
@@ -2142,10 +2142,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the Element
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameters the parameters for the {@link Element}; may
@@ -2171,15 +2171,15 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     @SuppressWarnings("unchecked")
-    public static final <U> Element<U> of(final String name,
-                                          final TypeToken<U> type,
+    public static final <U> Element<U> of(final TypeToken<U> type,
+                                          final String name,
                                           final List<? extends Class<?>> parameters,
                                           final List<? extends String> arguments) {
       final Type t = type == null ? null : type.type();
       if ((name == null || name.isEmpty()) && t == void.class && parameters == null && arguments == null) {
         return (Element<U>)root();
       }
-      return new Element<>(name, t, parameters, arguments, false);
+      return new Element<>(t, name, parameters, arguments, false);
     }
 
     /**
@@ -2192,10 +2192,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      * {@linkplain #arguments() arguments} will {@linkplain
      * Optional#get() yield} a copy of the supplied {@code arguments}.
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameters the parameters for the {@link Element}; may
@@ -2220,14 +2220,14 @@ public final class Path<T> implements Iterable<Element<?>> {
      * @threadsafety This method is safe for concurrent use by
      * multiple threads.
      */
-    public static final Element<?> of(final String name,
-                                      final Type type,
+    public static final Element<?> of(final Type type,
+                                      final String name,
                                       final List<? extends Class<?>> parameters,
                                       final List<? extends String> arguments) {
       if ((name == null || name.isEmpty()) && type == void.class && parameters == null && arguments == null) {
         return root();
       }
-      return new Element<>(name, type, parameters, arguments, false);
+      return new Element<>(type, name, parameters, arguments, false);
     }
 
     /**
@@ -2242,10 +2242,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the {@link Element}
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameter the sole parameter for the {@link Element}; may
@@ -2270,11 +2270,11 @@ public final class Path<T> implements Iterable<Element<?>> {
      * @threadsafety This method is safe for concurrent use by
      * multiple threads.
      */
-    public static final <U> Element<U> of(final String name,
-                                          final Class<U> type,
+    public static final <U> Element<U> of(final Class<U> type,
+                                          final String name,
                                           final Class<?> parameter,
                                           final String argument) {
-      return of(name, type, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
+      return of(type, name, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
     }
 
     /**
@@ -2289,10 +2289,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the {@link Element}
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameter the sole parameter for the {@link Element}; may
@@ -2317,11 +2317,11 @@ public final class Path<T> implements Iterable<Element<?>> {
      * @threadsafety This method is safe for concurrent use by
      * multiple threads.
      */
-    public static final <U> Element<U> of(final String name,
-                                          final TypeToken<U> type,
+    public static final <U> Element<U> of(final TypeToken<U> type,
+                                          final String name,
                                           final Class<?> parameter,
                                           final String argument) {
-      return of(name, type, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
+      return of(type, name, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
     }
 
     /**
@@ -2334,10 +2334,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      * {@linkplain #arguments() arguments} will {@linkplain
      * Optional#get() yield} the supplied {@code argument}.
      *
-     * @param name the name for the {@link Element}; may be {@code
+     * @param type the type for the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type for the {@link Element}; may be {@code
+     * @param name the name for the {@link Element}; may be {@code
      * null}
      *
      * @param parameter the sole parameter for the {@link Element}; may
@@ -2362,11 +2362,11 @@ public final class Path<T> implements Iterable<Element<?>> {
      * @threadsafety This method is safe for concurrent use by
      * multiple threads.
      */
-    public static final Element<?> of(final String name,
-                                      final Type type,
+    public static final Element<?> of(final Type type,
+                                      final String name,
                                       final Class<?> parameter,
                                       final String argument) {
-      return of(name, type, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
+      return of(type, name, parameter == null ? null : List.of(parameter), argument == null ? null : List.of(argument));
     }
 
     /**
@@ -2392,7 +2392,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     public static final Element<?> of(final String name) {
-      return new Element<>(name, null, null, null, false);
+      return new Element<>(null, name, null, null, false);
     }
 
     /**
@@ -2405,10 +2405,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the {@link Element}
      *
-     * @param name the name of the {@link Element}; may be {@code
+     * @param type the type of the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type of the {@link Element}; may be {@code
+     * @param name the name of the {@link Element}; may be {@code
      * null}
      *
      * @return an {@link Element} whose {@linkplain #name() name} will
@@ -2426,11 +2426,11 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     @SuppressWarnings("unchecked")
-    public static final <U> Element<U> of(final String name, final Class<U> type) {
+    public static final <U> Element<U> of(final Class<U> type, final String name) {
       if (name.isEmpty() && type == void.class) {
         return (Element<U>)root();
       }
-      return new Element<>(name, type, null, null, false);
+      return new Element<>(type, name, null, null, false);
     }
 
     /**
@@ -2443,10 +2443,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      *
      * @param <U> the type of the {@link Element}
      *
-     * @param name the name of the {@link Element}; may be {@code
+     * @param type the type of the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type of the {@link Element}; may be {@code
+     * @param name the name of the {@link Element}; may be {@code
      * null}
      *
      * @return an {@link Element} whose {@linkplain #name() name} will
@@ -2464,12 +2464,12 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     @SuppressWarnings("unchecked")
-    public static final <U> Element<U> of(final String name, final TypeToken<U> type) {
+    public static final <U> Element<U> of(final TypeToken<U> type, final String name) {
       final Type t = type.type();
       if (name.isEmpty() && t == void.class) {
         return (Element<U>)root();
       }
-      return new Element<>(name, t, null, null, false);
+      return new Element<>(t, name, null, null, false);
     }
 
     /**
@@ -2480,10 +2480,10 @@ public final class Path<T> implements Iterable<Element<?>> {
      * #parameters() parameters} and {@linkplain #arguments()
      * arguments} are {@linkplain Optional#isEmpty() empty}.
      *
-     * @param name the name of the {@link Element}; may be {@code
+     * @param type the type of the {@link Element}; may be {@code
      * null}
      *
-     * @param type the type of the {@link Element}; may be {@code
+     * @param name the name of the {@link Element}; may be {@code
      * null}
      *
      * @return an {@link Element} whose {@linkplain #name() name} will
@@ -2500,11 +2500,11 @@ public final class Path<T> implements Iterable<Element<?>> {
      * @threadsafety This method is safe for concurrent use by
      * multiple threads.
      */
-    public static final Element<?> of(final String name, final Type type) {
+    public static final Element<?> of(final Type type, final String name) {
       if (name.isEmpty() && type == void.class) {
         return root();
       }
-      return new Element<>(name, type, null, null, false);
+      return new Element<>(type, name, null, null, false);
     }
 
     /**
@@ -2539,7 +2539,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       if (type == void.class) {
         return (Element<U>)root();
       }
-      return new Element<>("", type, null, null, false);
+      return new Element<>(type, "", null, null, false);
     }
 
     /**
@@ -2575,7 +2575,7 @@ public final class Path<T> implements Iterable<Element<?>> {
       if (t == void.class) {
         return (Element<U>)root();
       } else {
-        return new Element<>("", t, null, null, false);
+        return new Element<>(t, "", null, null, false);
       }
     }
 
@@ -2605,7 +2605,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      * multiple threads.
      */
     public static final Element<?> of(final Type type) {
-      return type instanceof Class<?> c ? of(c) : new Element<>("", type, null, null, false);
+      return type instanceof Class<?> c ? of(c) : new Element<>(type, "", null, null, false);
     }
 
 
@@ -2614,6 +2614,7 @@ public final class Path<T> implements Iterable<Element<?>> {
      */
 
 
+    @Experimental
     static final class Parser {
 
 
@@ -2827,7 +2828,7 @@ public final class Path<T> implements Iterable<Element<?>> {
         if (name.isEmpty() && params == null && args == null && (type == null || type == void.class)) {
           return Element.root();
         } else {
-          return new Element<>(name, type, params, args, false);
+          return new Element<>(type, name, params, args, false);
         }
       }
 

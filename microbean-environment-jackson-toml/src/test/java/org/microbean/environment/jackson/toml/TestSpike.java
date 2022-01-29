@@ -53,12 +53,12 @@ final class TestSpike {
 
     // This extracts an object out of application.toml named "gorp",
     // also ignoring unknown properties.
-    final Blatz b = loader().load("gorp", Blatz.class).orElse(null);
+    final Blatz b = loader().load(Blatz.class, "gorp").orElse(null);
     assertNotNull(b);
     assertEquals("foo", b.getBlatz());
 
     // This goes after a single string.
-    final String blatz = loader().load(List.of("gorp", "blatz"), String.class).orElse(null);
+    final String blatz = loader().load(String.class, List.of("gorp", "blatz")).orElse(null);
   }
 
   @JsonAutoDetect(creatorVisibility = Visibility.NONE,

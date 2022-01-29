@@ -109,8 +109,8 @@ final class TestProxyingProvider {
         final Value<T> returnValue =
           new Value<T>(null, // no defaults
                        Qualifiers.of(),
-                       Path.of(Element.of("wheel",
-                                          wheelClass,
+                       Path.of(Element.of(wheelClass,
+                                          "wheel",
                                           List.of(String.class),
                                           List.of("LR"))),
                        (Supplier<T>)() -> (T)new Wheel() {
