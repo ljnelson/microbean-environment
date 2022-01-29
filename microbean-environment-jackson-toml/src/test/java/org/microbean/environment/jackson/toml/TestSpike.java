@@ -51,8 +51,8 @@ final class TestSpike {
     assertNotNull(f);
     assertEquals(37, f.getFrobnicationInterval());
 
-    // This extracts an object out of application.toml named "gorp",
-    // also ignoring unknown properties.
+    // This extracts a Blatz object out of application.toml named
+    // "gorp", also ignoring unknown properties.
     final Blatz b = loader().load(Blatz.class, "gorp").orElse(null);
     assertNotNull(b);
     assertEquals("foo", b.getBlatz());

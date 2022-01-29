@@ -25,6 +25,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -410,12 +411,12 @@ public final class Path<T> implements Iterable<Element<?>> {
    * Path.Element#of(Type, String) formed} from the supplied
    * arguments.
    *
-   * @param name the {@linkplain Path.Element#name() name} for the new
-   * trailing {@link Path.Element}; must not be {@code null}
-   *
    * @param <U> the type of the new {@link Path}
    *
    * @param type the {@linkplain Path.Element#type() type} for the new
+   * trailing {@link Path.Element}; must not be {@code null}
+   *
+   * @param name the {@linkplain Path.Element#name() name} for the new
    * trailing {@link Path.Element}; must not be {@code null}
    *
    * @return the new {@link Path}; never {@code null}
@@ -432,7 +433,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see #plus(Path.Element)
    */
   @Convenience
-  public final <U> Path<U> plus(final String name, final Class<U> type) {
+  public final <U> Path<U> plus(final Class<U> type, final String name) {
     return this.plus(Element.of(type, name));
   }
 
@@ -443,12 +444,12 @@ public final class Path<T> implements Iterable<Element<?>> {
    * Path.Element#of(Type, String) formed} from the supplied
    * arguments.
    *
-   * @param name the {@linkplain Path.Element#name() name} for the new
-   * trailing {@link Path.Element}; must not be {@code null}
-   *
    * @param <U> the type of the new {@link Path}
    *
    * @param type the {@linkplain Path.Element#type() type} for the new
+   * trailing {@link Path.Element}; must not be {@code null}
+   *
+   * @param name the {@linkplain Path.Element#name() name} for the new
    * trailing {@link Path.Element}; must not be {@code null}
    *
    * @return the new {@link Path}; never {@code null}
@@ -465,7 +466,7 @@ public final class Path<T> implements Iterable<Element<?>> {
    * @see #plus(Path.Element)
    */
   @Convenience
-  public final <U> Path<U> plus(final String name, final TypeToken<U> type) {
+  public final <U> Path<U> plus(final TypeToken<U> type, final String name) {
     return this.plus(Element.of(type, name));
   }
 
@@ -1337,6 +1338,43 @@ public final class Path<T> implements Iterable<Element<?>> {
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
    *
+   * @param names an array of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
+   *
+   * @return a suitable {@link Path}; never {@code null}
+   *
+   * @nullability This method never returns {@code null}.
+   *
+   * @idempotency This method is idempotent and deterministic.
+   *
+   * @threadsafety This method is safe for concurrent use by multiple
+   * threads.
+   *
+   * @see #of(List)
+   *
+   * @see Element#of(String)
+   *
+   * @see Element#of(TypeToken)
+   */
+  public static final <U> Path<U> of(final TypeToken<U> type, final String... names) {
+    return of(type, Arrays.asList(names));
+  }
+
+  /**
+   * Creates a {@link List} of {@link Element}s by invoking the {@link
+   * Element#of(String)} and {@link Element#of(TypeToken)} methods,
+   * supplies that {@link List} to the {@link #of(List)} method, and
+   * returns the resulting {@link Path}.
+   *
+   * @param <U> the {@linkplain Element#type() type} of the returned
+   * {@link Path}'s last {@link Element}, and hence the {@linkplain
+   * #type() type} of the {@link Path} itself
+   *
+   * @param type the {@linkplain Element#type() type} of the returned
+   * {@link Path}'s last {@link Element}, and hence the {@linkplain
+   * #type() type} of the {@link Path} itself
+   *
    * @param names a list of {@link String}s that will become
    * {@linkplain Element#name() element names}; must not be {@code
    * null}
@@ -1380,6 +1418,43 @@ public final class Path<T> implements Iterable<Element<?>> {
    * {@link Path}'s last {@link Element}, and hence the {@linkplain
    * #type() type} of the {@link Path} itself
    *
+   * @param names an array of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
+   *
+   * @return a suitable {@link Path}; never {@code null}
+   *
+   * @nullability This method never returns {@code null}.
+   *
+   * @idempotency This method is idempotent and deterministic.
+   *
+   * @threadsafety This method is safe for concurrent use by multiple
+   * threads.
+   *
+   * @see #of(Class, List)
+   *
+   * @see Element#of(String)
+   *
+   * @see Element#of(Class)
+   */
+  public static final <U> Path<U> of(final Class<U> type, final String... names) {
+    return of(type, Arrays.asList(names));
+  }
+  
+  /**
+   * Creates a {@link List} of {@link Element}s by invoking the {@link
+   * Element#of(String)} and {@link Element#of(Class)} methods,
+   * supplies that {@link List} to the {@link #of(List)} method, and
+   * returns the resulting {@link Path}.
+   *
+   * @param <U> the {@linkplain Element#type() type} of the returned
+   * {@link Path}'s last {@link Element}, and hence the {@linkplain
+   * #type() type} of the {@link Path} itself
+   *
+   * @param type the {@linkplain Element#type() type} of the returned
+   * {@link Path}'s last {@link Element}, and hence the {@linkplain
+   * #type() type} of the {@link Path} itself
+   *
    * @param names a list of {@link String}s that will become
    * {@linkplain Element#name() element names}; must not be {@code
    * null}
@@ -1409,6 +1484,39 @@ public final class Path<T> implements Iterable<Element<?>> {
     return (Path<U>)Path.of(elements);
   }
 
+  /**
+   * Creates a {@link List} of {@link Element}s by invoking the {@link
+   * Element#of(String)} and {@link Element#of(Type)} methods,
+   * supplies that {@link List} to the {@link #of(List)} method, and
+   * returns the resulting {@link Path}.
+   *
+   * @param type the {@linkplain Element#type() type} of the returned
+   * {@link Path}'s last {@link Element}, and hence the {@linkplain
+   * #type() type} of the {@link Path} itself
+   *
+   * @param names an array of {@link String}s that will become
+   * {@linkplain Element#name() element names}; must not be {@code
+   * null}
+   *
+   * @return a suitable {@link Path}; never {@code null}
+   *
+   * @nullability This method never returns {@code null}.
+   *
+   * @idempotency This method is idempotent and deterministic.
+   *
+   * @threadsafety This method is safe for concurrent use by multiple
+   * threads.
+   *
+   * @see #of(Type, List)
+   *
+   * @see Element#of(String)
+   *
+   * @see Element#of(Type)
+   */
+  public static final Path<?> of(final Type type, final String... names) {
+    return of(type, Arrays.asList(names));
+  }
+  
   /**
    * Creates a {@link List} of {@link Element}s by invoking the {@link
    * Element#of(String)} and {@link Element#of(Type)} methods,
